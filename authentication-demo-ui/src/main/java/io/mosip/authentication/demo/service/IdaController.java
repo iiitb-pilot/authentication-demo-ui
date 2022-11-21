@@ -213,6 +213,9 @@ public class IdaController {
 	@Value("${mosip.primary-language}")
 	private String applicationLanguage;
 
+	@Value("${mosip.auth.ekyc.label}")
+	private String[] ekycLabel;
+
 	private ResourceBundle labelBundle;
 
 	@PostConstruct
@@ -883,14 +886,22 @@ public class IdaController {
 				.writeValueAsString(mapper.readValue(cipher.doFinal(encryptedKycData), Object.class));
 		JSONParser parser = new JSONParser();
 		jsonObject = (JSONObject) parser.parse(ekycResponseText);
-		renderView(jsonObject, status);
+		LinkedHashMap lmap = new LinkedHashMap();
+		for (int i = 0; i < ekycLabel.length; i++) {
+			if(jsonObject.get(ekycLabel[i]) !=null){
+				lmap.put(ekycLabel[i], (String) jsonObject.get(ekycLabel[i]));
+			}else{
+				lmap.put(ekycLabel[i], "-");
+			}
+		}
+		renderView(lmap, status);
 	}
 
-	private void renderView(JSONObject jsonObject, boolean status) throws Exception {
+	private void renderView(LinkedHashMap jsonObject, boolean status) throws Exception {
 		dialog = null;
 		previewGrid = new GridPane();
 		GridPane photoPane = new GridPane();
-		photoPane.setPrefWidth(500);
+		photoPane.setPrefWidth(600);
 		ObservableList<ColumnConstraints> photoColumnConstraints = photoPane.getColumnConstraints();
 		ColumnConstraints photoConstraints1 = new ColumnConstraints();
 		photoConstraints1.setPercentWidth(70);
