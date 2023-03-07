@@ -48,7 +48,7 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" percentHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" percentHeight="40.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" percentHeight="40.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" percentHeight="40.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -61,13 +61,12 @@
                            <children>
                               <GridPane prefHeight="40.0">
                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="15.0" prefWidth="100.0" />
 	                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="12.0" prefWidth="100.0" />
 	                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="12.0" prefWidth="100.0" />
                                     <ColumnConstraints percentWidth="12.0" />
                                     <ColumnConstraints percentWidth="15.0" />
-                                    <ColumnConstraints minWidth="10.0" percentWidth="12.0" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="30.0" prefHeight="40.0" vgrow="SOMETIMES" />
@@ -79,11 +78,27 @@
                                     <CheckBox fx:id="faceAuthType" mnemonicParsing="false" onAction="#onFaceAuth" text="Face" GridPane.columnIndex="3" />
                                     <CheckBox fx:id="otpAuthType" mnemonicParsing="false" onAction="#onOTPAuth" text="OTP" GridPane.columnIndex="4" />
                                     <CheckBox fx:id="demoAuthType" mnemonicParsing="false" onAction="#onDemoAuth" text="Demographic" GridPane.columnIndex="5" />
-                                    <CheckBox fx:id="eKyc" mnemonicParsing="false" onAction="#onEKyc" text="eKYC" GridPane.columnIndex="6" />
                                  </children>
                               </GridPane>
                            </children>
                         </HBox>
+                         <HBox>
+                             <children>
+                                 <GridPane prefHeight="10.0">
+                                     <columnConstraints>
+                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" prefWidth="100.0"/>
+                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="12.0" prefWidth="100.0"/>
+                                     </columnConstraints>
+                                     <rowConstraints>
+                                         <RowConstraints minHeight="30.0" prefHeight="40.0" vgrow="SOMETIMES"/>
+                                     </rowConstraints>
+                                     <children>
+                                         <Label text="Is eKYC Required:" />
+                                         <CheckBox fx:id="eKyc" mnemonicParsing="false" onAction="#onEKyc" GridPane.columnIndex="1"/>
+                                     </children>
+                                 </GridPane>
+                             </children>
+                         </HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="80.0">
                            <children>
                               <Label text="Individual-ID:" />
@@ -102,7 +117,7 @@
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="55.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="2.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="43.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="43.0" prefWidth="100.0"/>
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -110,7 +125,7 @@
                      <children>
                         <AnchorPane fx:id="bioAnchorPane" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: black;">
                            <children>
-                              <Label layoutX="5.0" layoutY="1.0" text="Biometric Authentication" />
+                              <Label layoutX="5.0" layoutY="1.0" text="Biometric Authentication"/>
                            	  <Label ellipsisString="" layoutX="14.0" layoutY="15.0" prefHeight="37.0" prefWidth="131.0" text="Fingers Count:" />
                               <ComboBox fx:id="fingerCount" layoutX="110.0" layoutY="24.0" onAction="#onSubTypeSelection" prefWidth="150.0" />
                                <Label ellipsisString="" layoutX="14.0" layoutY="55.0" prefHeight="37.0" prefWidth="131.0" text="Iris Type:" />
@@ -120,7 +135,7 @@
                         </AnchorPane>
                         <AnchorPane fx:id="otpAnchorPane" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: black;" GridPane.columnIndex="2">
                            <children>
-                              <Label layoutX="5.0" layoutY="1.0" text="OTP Authentication" />
+                              <Label layoutX="5.0" layoutY="1.0" text="OTP Authentication"/>
                               <Button fx:id="requestOtp" layoutX="14.0" layoutY="24.0" mnemonicParsing="false" onAction="#onRequestOtp" prefWidth="200.0" text="Request OTP" />
                               <Label layoutX="14.0" layoutY="70.0" text="Enter OTP:" />
                               <TextField fx:id="otpValue" layoutX="91.0" layoutY="70.0" prefWidth="120.0" />
