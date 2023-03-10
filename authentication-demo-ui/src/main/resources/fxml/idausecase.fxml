@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" stylesheets="@/css/application.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.mosip.authentication.usecase.controller.IdaUsecaseController">
+   <children>
+      <BorderPane fx:id="mainPane">
+         <top>
+            <AnchorPane fx:id="topPane" prefHeight="150.0" BorderPane.alignment="CENTER">
+               <children>
+                  <GridPane prefHeight="150.0" prefWidth="900.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="65.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="15.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints percentHeight="37.0" vgrow="SOMETIMES" />
+                      <RowConstraints percentHeight="37.0" vgrow="SOMETIMES" />
+                      <RowConstraints percentHeight="26.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <AnchorPane id="banner" fx:id="bannerPane" prefHeight="150.0" styleClass="banner" GridPane.columnSpan="2" GridPane.rowSpan="3" />
+                        <Button fx:id="btnLogout" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onLogout" prefHeight="20.0" prefWidth="120.0" text="Logout" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="10.0" top="10.0" />
+                           </GridPane.margin>
+                        </Button>
+                     </children>
+                  </GridPane>
+                  <Line endX="798.4929809570312" endY="0.6498298645019531" layoutX="101.0" layoutY="152.0" startX="-100.0" />
+               </children>
+            </AnchorPane>
+         </top>
+         <center>
+            <AnchorPane fx:id="centerPane" prefHeight="475.0" BorderPane.alignment="CENTER" />
+         </center>
+         <bottom>
+            <AnchorPane fx:id="bottomPane" prefHeight="75.0" BorderPane.alignment="CENTER">
+               <children>
+                  <BorderPane>
+                     <top>
+                        <Line endX="798.4929809570312" endY="0.6498298645019531" startX="-100.0" BorderPane.alignment="CENTER" />
+                     </top>
+                     <center>
+                        <HBox fx:id="identityPaneButtonBox" alignment="CENTER" BorderPane.alignment="CENTER">
+                           <children>
+                              <SplitPane dividerPositions="0.5" pickOnBounds="false" style="-fx-box-border: transparent;">
+                                 <items>
+                                    <Button fx:id="btnVerify" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onVerify" prefHeight="20.0" prefWidth="120.0" text="Verify">
+                                       <graphic>
+                                          <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/verify.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                    <Button fx:id="btnReset" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onReset" prefHeight="25.0" prefWidth="120.0" text="Reset">
+                                       <graphic>
+                                          <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/reset.jpg" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                 </items>
+                              </SplitPane>
+                           </children>
+                           <BorderPane.margin>
+                              <Insets top="10.0" />
+                           </BorderPane.margin>
+                        </HBox>
+                     </center>
+                     <left>
+                        <HBox fx:id="loginButtonBox" prefHeight="37.0" prefWidth="262.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <SplitPane dividerPositions="0.5" pickOnBounds="false" style="-fx-box-border: transparent;">
+                                 <items>
+                                    <Button fx:id="btnLoginReset" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onLoginReset" prefHeight="20.0" prefWidth="120.0" text="Reset">
+                                       <graphic>
+                                          <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/reset.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                    <Button fx:id="btnlogin" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onLogin" prefHeight="25.0" prefWidth="120.0" text="Login">
+                                       <graphic>
+                                          <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/verify.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                 </items>
+                              </SplitPane>
+                           </children>
+                           <padding>
+                              <Insets left="10.0" />
+                           </padding>
+                           <BorderPane.margin>
+                              <Insets top="10.0" />
+                           </BorderPane.margin></HBox>
+                     </left>
+                     <right>
+                        <HBox fx:id="itemInfoPaneButtonBox" alignment="CENTER" BorderPane.alignment="CENTER">
+                           <children>
+                              <SplitPane dividerPositions="0.5" pickOnBounds="false" style="-fx-box-border: transparent;">
+                                 <items>
+                                    <Button fx:id="collect" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onCollect" prefHeight="20.0" prefWidth="120.0" text="Collect">
+                                       <graphic>
+                                          <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/collect.jpg" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                    <Button fx:id="back" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onBack" prefHeight="25.0" prefWidth="120.0" text="Back">
+                                       <graphic>
+                                          <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@/images/back.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Button>
+                                 </items>
+                              </SplitPane>
+                           </children>
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                           <BorderPane.margin>
+                              <Insets top="10.0" />
+                           </BorderPane.margin>
+                        </HBox>
+                     </right>
+                  </BorderPane>
+               </children>
+            </AnchorPane>
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>

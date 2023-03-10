@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="idcapturePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="475.0" prefWidth="900.0" stylesheets="@/css/application.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.mosip.authentication.usecase.controller.IdentityCaptureController">
+   <children>
+      <GridPane prefHeight="475.0" prefWidth="906.0" vgap="20.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="90.0" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="5.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints percentHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints percentHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="55.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="2.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="43.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <AnchorPane fx:id="bioAnchorPane" disable="true" style="-fx-border-color: black;">
+                     <children>
+                        <Label layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" text="Biometric Authentication" />
+                        <Label ellipsisString="" layoutX="34.0" layoutY="35.0" prefHeight="37.0" prefWidth="131.0" text="Fingers Count:" />
+                        <ComboBox fx:id="fingerCount" layoutX="130.0" layoutY="44.0" prefWidth="150.0" />
+                        <Label ellipsisString="" layoutX="34.0" layoutY="75.0" prefHeight="37.0" prefWidth="131.0" text="Iris Type:" />
+                        <ComboBox fx:id="irisType" layoutX="130.0" layoutY="85.0" prefWidth="150.0" />
+                        <Button fx:id="capture" contentDisplay="RIGHT" layoutX="110.0" layoutY="135.0" mnemonicParsing="false" onAction="#onCapture" prefWidth="120.0" text="Capture">
+                           <graphic>
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@/images/capture.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane fx:id="otpAnchorPane" disable="true" style="-fx-border-color: black;" GridPane.columnIndex="2">
+                     <children>
+                        <Label layoutX="10.0" layoutY="10.0" text="OTP Authentication" />
+                        <Button fx:id="requestOtp" contentDisplay="RIGHT" layoutX="34.0" layoutY="40.0" mnemonicParsing="false" onAction="#onRequestOtp" prefWidth="150.0" text="Request OTP">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="56.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@/images/requestotp.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <Label layoutX="34.0" layoutY="98.0" text="Enter OTP:" />
+                        <TextField fx:id="otpValue" layoutX="111.0" layoutY="95.0" prefWidth="120.0" />
+                     </children>
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </AnchorPane>
+               </children>
+            </GridPane>
+            <AnchorPane style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+               <children>
+                  <BorderPane prefHeight="40.0" prefWidth="804.0">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <top>
+                        <TextField fx:id="responsetextField" BorderPane.alignment="CENTER" />
+                     </top>
+                  </BorderPane>
+               </children>
+            </AnchorPane>
+            <AnchorPane style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <GridPane prefHeight="112.0" prefWidth="804.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="25.0" />
+                        <ColumnConstraints percentWidth="20.0" />
+                        <ColumnConstraints percentWidth="2.0" />
+                        <ColumnConstraints percentWidth="30.0" />
+                        <ColumnConstraints percentWidth="20.0" />
+                        <ColumnConstraints percentWidth="20.0" />
+                        <ColumnConstraints percentWidth="20.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints percentHeight="60.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="5.0" vgrow="SOMETIMES" />
+                        <RowConstraints percentHeight="35.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label />
+                        <RadioButton fx:id="rbFingerAuthType" mnemonicParsing="false" styleClass="fingerAuthType1" GridPane.columnIndex="1">
+                           <graphic>
+                              <ImageView id="thumbprint" fitHeight="76.0" fitWidth="43.0" pickOnBounds="true" preserveRatio="true" styleClass="thumbprint">
+                                 <image>
+                                    <Image url="@/images/thumbprint.jpg" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="authTypeGroup" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="rbIrisAuthType" graphicTextGap="8.0" mnemonicParsing="false" toggleGroup="$authTypeGroup" GridPane.columnIndex="2">
+                           <graphic>
+                              <ImageView fitHeight="29.0" fitWidth="69.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@/images/irisprint.jpg" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </RadioButton>
+                        <RadioButton fx:id="rbOTPAuthType" mnemonicParsing="false" toggleGroup="$authTypeGroup" GridPane.columnIndex="3">
+                           <graphic>
+                              <ImageView fitHeight="70.0" fitWidth="43.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@/images/otp.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </RadioButton>
+                        <Label text="ID Number" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <TextField fx:id="idValue" prefWidth="200.0" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                        <Label text="National Id" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <ComboBox fx:id="idTypebox" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" />
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </GridPane>
+               </children>
+            </AnchorPane>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </GridPane>
+   </children>
+</AnchorPane>

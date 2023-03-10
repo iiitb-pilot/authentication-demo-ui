@@ -1,0 +1,102 @@
+.root {
+  /*This applies styling for the root node*/
+  -fx-background-color : white;
+}
+
+.label {
+  /* Styling for all Control with the class of 'label' */
+  -fx-font-weight: bold;
+}
+
+.banner {
+    -fx-background-image:url('../images/banner.png');
+	-fx-background-repeat: no-repeat;
+}
+
+* {
+	-fx-primary-color: #007acc;
+	-fx-secondary-color: #4B6EAF;
+	-fx-focus-color: -fx-secondary-color;
+	-fx-tpbg-color: #E6F8E8;
+	-fx-cpbg-color: #fefffd;
+	-fx-bpbg-color: #E6F8E8;
+}
+
+#topPane {
+	-fx-background-color: -fx-tpbg-color;
+}
+
+#bottomPane {
+	-fx-background-color: -fx-bpbg-color;
+}
+#loginPane {
+	-fx-background-color: -fx-cpbg-color;
+}
+
+#idcapturePane {
+	-fx-background-color: -fx-cpbg-color;
+}
+
+#iteminfoPane {
+	-fx-background-color: -fx-cpbg-color;
+}
+
+#itemTable .table-cell {
+	-fx-alignment: CENTER-RIGHT;
+	-fx-font-weight: bold;
+	-fx-font-size: 15px;
+    -fx-skin: "com.sun.javafx.scene.control.skin.TableCellSkin";
+    -fx-padding: 0.166667em; /* 2px, plus border adds 1px */
+
+    -fx-background-color: transparent;
+    -fx-border-color: transparent -fx-table-cell-border-color transparent transparent;
+    -fx-border-width: 0.083333em; /* 1 */
+    -fx-cell-size: 2.0em; /* 24 */
+    -fx-text-fill: -fx-text-inner-color;	
+}
+
+
+.tab-header-area .tab-header-background {
+ 	-fx-background-color: -fx-primary-color;
+}
+.tab-pane .tab:selected {
+	-fx-background-color: -fx-secondary-color;
+	-fx-background-insets: 0 0 0 0;
+	-fx-background-radius: 0 0 0 0;
+}
+.tab .tab-label { 
+ 	-fx-alignment: CENTER;
+	-fx-text-fill: white;
+	-fx-font-weight: bold;
+	-fx-padding: 0 10 0 10;
+}
+.tab-pane:top *.tab-header-area {
+	-fx-padding: 0 0 0 5;
+	
+	/* NO SPACE LEFT OF FIRST TAB */
+	/* -fx-padding: 0 0 0 30; */
+}
+.tab-pane {
+	-fx-background-color: transparent;
+	-fx-tab-min-width: 100px;
+	-fx-tab-min-height: 30px;
+	-fx-tab-max-height: 30px;
+}
+.tab-pane .tab {
+	-fx-background-color: transparent;
+}
+.tab-pane:focused .tab-header-area .headers-region .tab:selected .focus-indicator {
+ 	-fx-border-width: 0;
+	-fx-border-insets: 0 0 0 0;
+	-fx-border-radius: 0;
+}
+
+.notification-bar > .pane {
+    -fx-background-color: #007acc !important;
+    -fx-padding: 10 10 10 10 !important;
+}
+
+.notification-bar > .pane .label {
+    -fx-font-weight: bold !important;
+    -fx-text-fill: white !important;
+}
