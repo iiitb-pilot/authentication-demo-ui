@@ -141,7 +141,8 @@ public class ItemInfoController implements Initializable {
 			}
 			lblAddress.setText(address);
 			
-			String imageValue = (String) jsonObject.get("photo");
+			String photoFields = env.getProperty("ekyc.mapfield.photo");
+			String imageValue = (String) jsonObject.get(photoFields);
 			ConvertRequestDto requestDto = new ConvertRequestDto();
 			requestDto.setModality("Face");
 			requestDto.setVersion("ISO19794_5_2011");
