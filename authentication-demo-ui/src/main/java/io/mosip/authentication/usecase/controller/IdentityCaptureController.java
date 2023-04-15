@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.mosip.authentication.usecase.dto.AppContext;
+import io.mosip.authentication.usecase.dto.MdmBioDevice;
+import io.mosip.authentication.usecase.helper.DeviceHelper;
 import io.mosip.authentication.usecase.helper.IdentityCaptureHelper;
 import io.mosip.kernel.core.util.StringUtils;
 import javafx.beans.binding.Bindings;
@@ -52,6 +54,9 @@ public class IdentityCaptureController {
 	@Autowired
 	private IdentityCaptureHelper helper;
 	
+	@Autowired
+	DeviceHelper deviceHelper;
+	
 	private String previousHash;
 	private StringProperty capture = new SimpleStringProperty();
 	ObjectMapper mapper = new ObjectMapper();
@@ -59,12 +64,16 @@ public class IdentityCaptureController {
 	private BooleanProperty isFPselected = new SimpleBooleanProperty(false);
 	private BooleanProperty isIrisSelected = new SimpleBooleanProperty(false);
 	private BooleanProperty isOTPSelected = new SimpleBooleanProperty(false);
+	private BooleanProperty isSuccessResponse = new SimpleBooleanProperty(false);
 	
 	ObservableList<String> idTypeChoices = FXCollections.observableArrayList("UIN", "VID");
 	ObservableList<String> fingerCountChoices = FXCollections.observableArrayList("1", "2", "3", "4", "5", "6", "7",
 			"8", "9", "10");
 	ObservableList<String> irisCountChoices = FXCollections.observableArrayList("Left Iris", "Right Iris",
 			"Both Iris");
+	
+	ObservableList<String> fpDevicesList = FXCollections.observableArrayList();
+	ObservableList<String> irisDevicesList = FXCollections.observableArrayList();
 	
 	@FXML
 	private AnchorPane idcapturePane;
@@ -97,6 +106,9 @@ public class IdentityCaptureController {
 	private ComboBox<String> idTypebox;
 	
 	@FXML
+	private ComboBox<String> deviceBox;
+	
+	@FXML
 	private TextField otpValue;
 	
 	@FXML
@@ -105,8 +117,12 @@ public class IdentityCaptureController {
 	@FXML
 	private AnchorPane bioAnchorPane;
 	
+	@FXML
+	private Button btnCapture;
+	
 	Stage dialog;
 	private AppContext appContext;
+	private Map<String, Map<String, MdmBioDevice>> availableDeviceInfoMap;
 	
     public void setContext(AppContext appContextInfo) {
     	this.appContext = appContextInfo;
@@ -116,6 +132,7 @@ public class IdentityCaptureController {
     	this.appContext.isOTPAuthProperty().bind(Bindings.when(isOTPAuth()).then(true).otherwise(false));
     	this.appContext.otpValueProperty().bind(otpValue.textProperty());
     	this.appContext.captureValueProperty().bind(capture);
+    	this.appContext.isIdExistProperty().bind(Bindings.when(idValue.textProperty().isEmpty()).then(false).otherwise(true));
     }
     
 	public void initialize() {
@@ -127,7 +144,6 @@ public class IdentityCaptureController {
 
 		idTypebox.setItems(idTypeChoices);
 		idTypebox.setValue("UIN");
-		otpAnchorPane.setDisable(true);
 		bioAnchorPane.setDisable(true);
 		responsetextField.setDisable(true);
 
@@ -135,10 +151,27 @@ public class IdentityCaptureController {
 		rbIrisAuthType.selectedProperty().addListener(rbIrisAuthTypeChangeListener());
 		rbOTPAuthType.selectedProperty().addListener(rbOTPAuthTypeChangeListener());
 		
-		bioAnchorPane.disableProperty().bind(Bindings.when(isBioAuth()).then(false).otherwise(true));
-		otpAnchorPane.disableProperty().bind(Bindings.when(isOTPAuth()).then(false).otherwise(true));
+		bioAnchorPane.disableProperty().bind(Bindings.when(canBioPaneEnable()).then(false).otherwise(true));
+		otpAnchorPane.disableProperty().bind(Bindings.when(canOTPPaneEnable()).then(false).otherwise(true));
 		fingerCount.disableProperty().bind(Bindings.when(isFPselected).then(false).otherwise(true));
 		irisType.disableProperty().bind(Bindings.when(isIrisSelected).then(false).otherwise(true));
+		
+		availableDeviceInfoMap = deviceHelper.getDeviceList();
+		fpDevicesList.clear();
+		irisDevicesList.clear();
+		for (var entry : availableDeviceInfoMap.entrySet()) {
+			if (entry.getKey().equals("finger_single")) {
+				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
+				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
+					fpDevicesList.add(deviceEntry.getKey());
+				}
+			} else if (entry.getKey().equals("iris_single")) {
+				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
+				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
+					irisDevicesList.add(deviceEntry.getKey());
+				}				
+			}
+		}
 	}
 	
 	public void reset() {
@@ -166,6 +199,7 @@ public class IdentityCaptureController {
 		if (otpResponse.getStatusCode().is2xxSuccessful()) {
 			List errors = ((List) otpResponse.getBody().get("errors"));
 			boolean status = errors == null || errors.isEmpty();
+			isSuccessResponse.set(true);
 			String responseText = status ? "OTP request successfully sent" : "OTP request failed to sent";
 			if (status) {
 				helper.showNotification("OTP", responseText, appContext.getTopPane(), "SUCCESS");
@@ -174,20 +208,26 @@ public class IdentityCaptureController {
 			}
 			responsetextField.setText(responseText);
 		} else {
+			isSuccessResponse.set(false);
 			helper.showNotification("OTP", "OTP request failed with error", appContext.getTopPane(), "FAILURE");
 		}
 	}
 	
 	@FXML
 	private void onCapture() throws Exception {
+		isSuccessResponse.set(false);
 		previousHash = null;
 		List<String> bioCaptures = new ArrayList<>();
 		String fingerCapture;
 		if (rbFingerAuthType.isSelected()) {
-			fingerCapture = helper.captureFingerprint(getFingerCount(), getPreviousHash(), appContext);
-			if (!fingerCapture.contains("\"biometrics\"")) {
+			MdmBioDevice mdmBioDevice = getSelectedDeviceInfo();
+			fingerCapture = helper.captureFingerprint(getFingerCount(), getPreviousHash(), appContext, mdmBioDevice);
+			String result = helper.validateResult(fingerCapture, appContext, getPreviousHash());
+			if (result == null) {
+				isSuccessResponse.set(false);
 				return;
 			}
+			isSuccessResponse.set(true);
 			bioCaptures.add(fingerCapture);
 
 			Integer delay = env.getProperty("delay.after.finger.capture.millisecs", Integer.class, 0);
@@ -198,10 +238,14 @@ public class IdentityCaptureController {
 		}
 		String irisCapture;
 		if (rbIrisAuthType.isSelected()) {
-			irisCapture = helper.captureIris(getIrisCount(), getIrisDeviceSubId(), getPreviousHash(), appContext);
-			if (!irisCapture.contains("\"biometrics\"")) {
+			MdmBioDevice mdmBioDevice = getSelectedDeviceInfo();
+			irisCapture = helper.captureIris(getIrisCount(), getIrisDeviceSubId(), getPreviousHash(), appContext, mdmBioDevice);
+			String result = helper.validateResult(irisCapture, appContext, getPreviousHash());
+			if (result == null) {
+				isSuccessResponse.set(false);
 				return;
 			}
+			isSuccessResponse.set(true);
 			bioCaptures.add(irisCapture);
 			Integer delay = env.getProperty("delay.after.iris.capture.millisecs", Integer.class, 0);
 			if (delay > 0) {
@@ -212,13 +256,42 @@ public class IdentityCaptureController {
 		capture.set(helper.combineCaptures(bioCaptures));
 	}
 	
+	private MdmBioDevice getSelectedDeviceInfo() {
+		MdmBioDevice deviceInfo = null;
+		String key = "finger_single";
+		String selectedDevice = deviceBox.getValue();
+		if (rbIrisAuthType.isSelected()) {
+			key = "iris_single";
+		}
+		for (var entry : availableDeviceInfoMap.entrySet()) {
+			if (entry.getKey().equals(key)) {
+				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
+				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
+					if (deviceEntry.getKey().equals(selectedDevice)) {
+						deviceInfo = deviceEntry.getValue();
+					}
+				}
+			}
+		}
+		return deviceInfo;
+	}
+	
 	private ChangeListener<Boolean> rbFingerAuthTypeChangeListener() {
+		isOTPSelected.setValue(Boolean.FALSE);
+		isFPselected.setValue(Boolean.FALSE);
+		isIrisSelected.setValue(Boolean.FALSE);
 		return new ChangeListener<Boolean>() {
 		    @Override
 		    public void changed(ObservableValue<? extends Boolean> obs, Boolean wasPreviouslySelected, Boolean isNowSelected) {
 		        if (isNowSelected) { 
 		        	isFPselected.setValue(Boolean.TRUE);
 		        	otpValue.setText("");
+		        	deviceBox.setDisable(false);
+		        	deviceBox.setItems(fpDevicesList);
+		        	deviceBox.getSelectionModel().selectFirst();
+		        	if (deviceBox.getValue() == null) {
+		        		isFPselected.setValue(Boolean.FALSE);
+		        	}		        	
 		        } else {
 		        	isFPselected.setValue(Boolean.FALSE);
 		        }
@@ -227,12 +300,21 @@ public class IdentityCaptureController {
 	}
 	
 	private ChangeListener<Boolean> rbIrisAuthTypeChangeListener() {
+		isOTPSelected.setValue(Boolean.FALSE);
+		isFPselected.setValue(Boolean.FALSE);
+		isIrisSelected.setValue(Boolean.FALSE);		
 		return new ChangeListener<Boolean>() {
 		    @Override
 		    public void changed(ObservableValue<? extends Boolean> obs, Boolean wasPreviouslySelected, Boolean isNowSelected) {
 		        if (isNowSelected) { 
 		        	isIrisSelected.setValue(Boolean.TRUE);
 		        	otpValue.setText("");
+		        	deviceBox.setDisable(false);
+		        	deviceBox.setItems(irisDevicesList);
+		        	deviceBox.getSelectionModel().selectFirst();
+		        	if (deviceBox.getValue() == null) {
+		        		isIrisSelected.setValue(Boolean.FALSE);
+		        	}
 		        } else {
 		        	isIrisSelected.setValue(Boolean.FALSE);
 		        }
@@ -241,11 +323,15 @@ public class IdentityCaptureController {
 	}
 	
 	private ChangeListener<Boolean> rbOTPAuthTypeChangeListener() {
+		isOTPSelected.setValue(Boolean.FALSE);
+		isFPselected.setValue(Boolean.FALSE);
+		isIrisSelected.setValue(Boolean.FALSE);		
 		return new ChangeListener<Boolean>() {
 		    @Override
 		    public void changed(ObservableValue<? extends Boolean> obs, Boolean wasPreviouslySelected, Boolean isNowSelected) {
 		        if (isNowSelected) { 
 		        	isOTPSelected.setValue(Boolean.TRUE);
+		        	deviceBox.setDisable(true);
 		        } else {
 		        	isOTPSelected.setValue(Boolean.FALSE);
 		        }
@@ -258,12 +344,30 @@ public class IdentityCaptureController {
 	}
 	
 	private BooleanBinding isBioAuth() {
-		BooleanBinding isReady = Bindings.when(isFPselected.or(isIrisSelected)).then(true).otherwise(false);
+		BooleanBinding isReady = Bindings
+				.when(isFPselected.or(isIrisSelected).and(idValue.textProperty().isNotEmpty()).and(isSuccessResponse))
+				.then(true).otherwise(false);
+		return isReady;
+	}
+	
+	private BooleanBinding canBioPaneEnable() {
+		BooleanBinding isReady = Bindings
+				.when(isFPselected.or(isIrisSelected).and(idValue.textProperty().isNotEmpty()))
+				.then(true).otherwise(false);
 		return isReady;
 	}
 	
 	private BooleanBinding isOTPAuth() {
-		BooleanBinding isReady = Bindings.when(isOTPSelected).then(true).otherwise(false);
+		BooleanBinding isReady = Bindings
+				.when(isOTPSelected.and(idValue.textProperty().isNotEmpty()).and(isSuccessResponse)).then(true)
+				.otherwise(false);
+		return isReady;
+	}
+	
+	private BooleanBinding canOTPPaneEnable() {
+		BooleanBinding isReady = Bindings
+				.when(isOTPSelected.and(idValue.textProperty().isNotEmpty())).then(true)
+				.otherwise(false);
 		return isReady;
 	}
 	

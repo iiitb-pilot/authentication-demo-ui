@@ -103,7 +103,7 @@
                                        <graphic>
                                           <ImageView fitHeight="30.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@/images/reset.png" />
+                                                <Image url="@/images/reset.jpg" />
                                              </image>
                                           </ImageView>
                                        </graphic>

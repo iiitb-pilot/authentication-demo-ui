@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -84,7 +85,9 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -98,6 +101,9 @@ import io.mosip.authentication.demo.helper.CryptoUtility;
 import io.mosip.authentication.demo.service.util.KeyMgrUtil;
 import io.mosip.authentication.demo.service.util.SignatureUtil;
 import io.mosip.authentication.usecase.dto.AppContext;
+import io.mosip.authentication.usecase.dto.AuthRequest;
+import io.mosip.authentication.usecase.dto.AuthRequestBioInfo;
+import io.mosip.authentication.usecase.dto.MdmBioDevice;
 import io.mosip.kernel.core.http.RequestWrapper;
 import io.mosip.kernel.core.util.CryptoUtil;
 import io.mosip.kernel.core.util.DateUtils;
@@ -349,45 +355,53 @@ public class IdentityCaptureHelper {
 		return env.getProperty("isPreLTS", Boolean.class, false);
 	}
 	
-	public String captureFingerprint(int fingerCount, String prevHash, AppContext appContext) throws Exception {
-		String requestBody = getCaptureRequestTemplate();
-
-		requestBody = requestBody.replace("$timeout", env.getProperty("ida.request.captureFinger.timeout"))
-				.replace("$count", String.valueOf(fingerCount))
-				.replace("$deviceId", env.getProperty("ida.request.captureFinger.deviceId"))
-				.replace("$domainUri", env.getProperty("ida.request.captureFinger.domainUri"))
-				.replace("$deviceSubId", getFingerDeviceSubId()).replace("$captureTime", getCaptureTime())
-				.replace("$previousHash", prevHash)
-				.replace("$requestedScore", env.getProperty("ida.request.captureFinger.requestedScore"))
-				.replace("$type", env.getProperty("ida.request.captureFinger.type"))
-				.replace("$bioSubType",
-						getBioSubTypeString(fingerCount, env.getProperty("ida.request.captureFinger.bioSubType")))
-				.replace("$name", env.getProperty("ida.request.captureFinger.name"))
-				.replace("$value", env.getProperty("ida.request.captureFinger.value"))
-				.replace("$env", env.getProperty("ida.request.captureFinger.env"));
-
-		return capturebiometrics(requestBody, prevHash, appContext);
+	public AuthRequest getAuthRequest(MdmBioDevice mdmBioDevice) throws Exception {
+		AuthRequest authRequest = new AuthRequest();
+		authRequest.setPurpose(mdmBioDevice.getPurpose());
+		authRequest.setSpecVersion(mdmBioDevice.getSpecVersion());
+		authRequest.setCaptureTime(getCaptureTime());
+		authRequest.setBio(new ArrayList<AuthRequestBioInfo>());
+		AuthRequestBioInfo bioInfo = new AuthRequestBioInfo();
+		bioInfo.setType(mdmBioDevice.getDeviceType());
+		bioInfo.setDeviceId(mdmBioDevice.getDeviceId());
+		authRequest.getBio().add(bioInfo);
+		return authRequest;
 	}
 	
-	public String captureIris(int irisCount, String irisSubId, String prevHash, AppContext appContext) throws Exception {
-		String requestBody = getCaptureRequestTemplate();
-
+	public String captureFingerprint(int fingerCount, String prevHash, AppContext appContext, MdmBioDevice mdmBioDevice) throws Exception {
+		
+		AuthRequest authRequest = getAuthRequest(mdmBioDevice);
+		authRequest.setEnv(env.getProperty("ida.request.captureFinger.env"));
+		authRequest.setTimeout(env.getProperty("ida.request.captureFinger.timeout"));
+		authRequest.setDomainUri(env.getProperty("ida.request.captureFinger.domainUri"));
+		authRequest.setTransactionId(getTransactionID());
+		List<AuthRequestBioInfo> bioInfo = authRequest.getBio();
+		bioInfo.get(0).setCount(String.valueOf(fingerCount));
+		bioInfo.get(0).setBioSubType(getBioSubTypeString(fingerCount, env.getProperty("ida.request.captureFinger.bioSubType")).split(","));
+		bioInfo.get(0).setDeviceSubId(getFingerDeviceSubId());
+		bioInfo.get(0).setPreviousHash(prevHash);
+		bioInfo.get(0).setRequestedScore(env.getProperty("ida.request.captureFinger.requestedScore"));
+		String requestBody = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(authRequest);
+		return capturebiometrics(requestBody, prevHash, appContext, mdmBioDevice);
+	}
+	
+	public String captureIris(int irisCount, String irisSubId, String prevHash, AppContext appContext, MdmBioDevice mdmBioDevice) throws Exception {
 		String irisSubtype = getIrisSubType(irisCount);
 		String bioSubType = getBioSubTypeString(irisCount, irisSubtype);
-		requestBody = requestBody.replace("$timeout", env.getProperty("ida.request.captureIris.timeout"))
-				.replace("$count", String.valueOf(irisCount))
-				.replace("$deviceId", env.getProperty("ida.request.captureIris.deviceId"))
-				.replace("$domainUri", env.getProperty("ida.request.captureIris.domainUri"))
-				.replace("$deviceSubId", irisSubId).replace("$captureTime", getCaptureTime())
-				.replace("$previousHash", prevHash)
-				.replace("$requestedScore", env.getProperty("ida.request.captureIris.requestedScore"))
-				.replace("$type", env.getProperty("ida.request.captureIris.type"))
-				.replace("$bioSubType",	bioSubType)
-				.replace("$name", env.getProperty("ida.request.captureIris.name"))
-				.replace("$value", env.getProperty("ida.request.captureIris.value"))
-				.replace("$env", env.getProperty("ida.request.captureIris.env"));
 
-		return capturebiometrics(requestBody, prevHash, appContext);
+		AuthRequest authRequest = getAuthRequest(mdmBioDevice);
+		authRequest.setEnv(env.getProperty("ida.request.captureIris.env"));
+		authRequest.setTimeout(env.getProperty("ida.request.captureIris.timeout"));
+		authRequest.setDomainUri(env.getProperty("ida.request.captureIris.domainUri"));
+		authRequest.setTransactionId(getTransactionID());
+		List<AuthRequestBioInfo> bioInfo = authRequest.getBio();
+		bioInfo.get(0).setCount(String.valueOf(irisCount));
+		bioInfo.get(0).setBioSubType(bioSubType.split(","));
+		bioInfo.get(0).setDeviceSubId(irisSubId);
+		bioInfo.get(0).setPreviousHash(prevHash);
+		bioInfo.get(0).setRequestedScore(env.getProperty("ida.request.captureIris.requestedScore"));
+		String requestBody = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(authRequest);
+		return capturebiometrics(requestBody, prevHash, appContext, mdmBioDevice);
 	}
 	
 	private String getFingerDeviceSubId() {
@@ -407,12 +421,11 @@ public class IdentityCaptureHelper {
 		return nowAsISO;
 	}
 	
-	@SuppressWarnings("rawtypes")
-	private String capturebiometrics(String requestBody, String prevHash, AppContext appContext) throws Exception {
+	private String capturebiometrics(String requestBody, String prevHash, AppContext appContext, MdmBioDevice mdmBioDevice) throws Exception {
 		System.out.println("Capture request:\n" + requestBody);
 		CloseableHttpClient client = HttpClients.createDefault();
 		StringEntity requestEntity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
-		HttpUriRequest request = RequestBuilder.create("CAPTURE").setUri(env.getProperty("ida.captureRequest.uri"))
+		HttpUriRequest request = RequestBuilder.create("CAPTURE").setUri(mdmBioDevice.getCallbackId() + "capture")
 				.setEntity(requestEntity).build();
 		CloseableHttpResponse response;
 		StringBuilder stringBuilder = new StringBuilder();
@@ -432,8 +445,14 @@ public class IdentityCaptureHelper {
 			return null;
 		}
 		String result = stringBuilder.toString();
-		String error = null;
+		return result;
+	}
 
+	@SuppressWarnings("rawtypes")
+	public String validateResult(String result, AppContext appContext, String prevHash)
+			throws IOException, JsonParseException, JsonMappingException {
+		String returnValue = null;
+		String error = null;
 		List data = (List) objectMapper.readValue(result.getBytes(), Map.class).get("biometrics");
 		if (data == null) {
 			showNotification("Authentication", result, appContext.getTopPane(), "SUCCESS");
@@ -444,6 +463,7 @@ public class IdentityCaptureHelper {
 			Map errorMap = (Map) e.get("error");
 			error = errorMap.get("errorCode").toString();
 			if (error.equals(DEFAULT_SUBID) || error.equals("100")) {
+				returnValue = result;
 				showNotification("Authentication", "Capture Success", appContext.getTopPane(), "SUCCESS");
 				ObjectMapper objectMapper = new ObjectMapper();
 				List dataList = (List) objectMapper.readValue(result.getBytes(), Map.class).get("biometrics");
@@ -456,28 +476,21 @@ public class IdentityCaptureHelper {
 					prevHash = (String) b.get("hash");
 				}
 			} else {
+				returnValue = null;
 				showNotification("Authentication", "Capture Failed", appContext.getTopPane(), "FAILURE");
 				break;
 			}
 		}
-		System.out.println(result);
-		return result;
-	}
-	
-	private String getCaptureRequestTemplate() {
-		String requestBody = new String(
-				cryptoUtil.decodeBase64(env.getProperty("ida.request.captureRequest.template")));
-		System.out.println(requestBody);
-		return requestBody;
+		return returnValue;
 	}
 	
 	private String getBioSubTypeString(int count, String bioValue) {
 		if (count == 1) {
-			return "\"" + bioValue + "\"";
+			return bioValue;
 		}
-		String finalStr = "\"" + bioValue + "\"";
+		String finalStr =  bioValue ;
 		for (int i = 2; i <= count; i++) {
-			finalStr = finalStr + "," + "\"" + bioValue + "\"";
+			finalStr = finalStr + "," + bioValue;
 		}
 		return finalStr;
 	}

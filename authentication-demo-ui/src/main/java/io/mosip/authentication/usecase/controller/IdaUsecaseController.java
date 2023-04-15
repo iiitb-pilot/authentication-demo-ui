@@ -154,10 +154,12 @@ public class IdaUsecaseController {
 				helper.showNotification("Authentication", "Id Number is required to proceed...", topPane, "WARNING");
 				return;
 			}
-			ResponseEntity<Map> authResponse = helper.getAuthResponse(appContext);
-			if (authResponse != null) {
-				String ekycInfo = helper.decryptEKYCinfo(authResponse);
-				openItemInfo(ekycInfo);
+			if (appContext.getIsBioAuth() || appContext.getIsOTPAuth()) {
+				ResponseEntity<Map> authResponse = helper.getAuthResponse(appContext);
+				if (authResponse != null) {
+					String ekycInfo = helper.decryptEKYCinfo(authResponse);
+					openItemInfo(ekycInfo);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -190,6 +192,7 @@ public class IdaUsecaseController {
 		appContext.passwordProperty().addListener(passwordChangeListener());
 		btnlogin.disableProperty().bind(Bindings.when(isLoginReady()).then(false).otherwise(true));
 		btnLoginReset.disableProperty().bind(Bindings.when(isResetReady()).then(false).otherwise(true));
+		btnVerify.disableProperty().bind(Bindings.when(isVerifyReady()).then(false).otherwise(true));
 	}
 	
 	private ChangeListener<String> userNameChangeListener() {
@@ -225,6 +228,11 @@ public class IdaUsecaseController {
 	
 	private BooleanBinding isResetReady() {
 		BooleanBinding isReady = Bindings.when(hasUserNameValue.or(hasPasswordValue)).then(true).otherwise(false);
+		return isReady;
+	}
+	
+	private BooleanBinding isVerifyReady() {
+		BooleanBinding isReady = Bindings.when(appContext.isBioAuthProperty().or(appContext.isOTPAuthProperty()).and(appContext.isIdExistProperty())).then(true).otherwise(false);
 		return isReady;
 	}
 	

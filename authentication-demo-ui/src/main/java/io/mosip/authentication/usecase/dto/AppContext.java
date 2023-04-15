@@ -12,6 +12,7 @@ public class AppContext {
 	private StringProperty password = new SimpleStringProperty("");
 	private BooleanProperty isBioAuth = new SimpleBooleanProperty();
 	private BooleanProperty isOTPAuth = new SimpleBooleanProperty();
+	private BooleanProperty isIdExist = new SimpleBooleanProperty();
 	private StringProperty individualId = new SimpleStringProperty("");
 	private StringProperty individualIdType = new SimpleStringProperty("");
 	private StringProperty otpValue = new SimpleStringProperty("");
@@ -72,6 +73,18 @@ public class AppContext {
 	
 	public boolean getIsOTPAuth() {
 		return isOTPAuth.get();
+	}
+	
+    public BooleanProperty isIdExistProperty() {
+        return isIdExist;
+    }
+    
+	public void setIsIdExist(boolean idExist) {
+		isIdExist.set(idExist);
+	}
+	
+	public boolean getIsIdExist() {
+		return isIdExist.get();
 	}
 	
     public StringProperty individualIdProperty() {
