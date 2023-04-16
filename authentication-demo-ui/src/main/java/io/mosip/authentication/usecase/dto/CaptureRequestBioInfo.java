@@ -3,7 +3,7 @@ package io.mosip.authentication.usecase.dto;
 import lombok.Data;
 
 @Data
-public class AuthRequestBioInfo {
+public class CaptureRequestBioInfo {
 	private String type;
 	private String count;
 	private String[] bioSubType;

@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class AuthRequest {
+public class CaptureRequest {
 	private String env;
 	private String purpose;
 	private String specVersion;
@@ -14,5 +14,5 @@ public class AuthRequest {
 	private String domainUri;
 	private String transactionId;
 	private String customOpts;
-	private List<AuthRequestBioInfo> bio;
+	private List<CaptureRequestBioInfo> bio;
 }

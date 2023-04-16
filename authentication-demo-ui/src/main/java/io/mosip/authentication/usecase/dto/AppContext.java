@@ -1,5 +1,8 @@
 package io.mosip.authentication.usecase.dto;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +20,7 @@ public class AppContext {
 	private StringProperty individualIdType = new SimpleStringProperty("");
 	private StringProperty otpValue = new SimpleStringProperty("");
 	private StringProperty captureValue = new SimpleStringProperty("");
+	private Map<String, Map<String, MdmBioDevice>> availableDeviceInfoMap = new LinkedHashMap<String, Map<String,MdmBioDevice>>();
 	private AnchorPane topPane;
 	
     public StringProperty userNameProperty() {
@@ -135,4 +139,11 @@ public class AppContext {
 		return captureValue.get();
 	}
 	
+	public Map<String, Map<String, MdmBioDevice>> getAvailableDeviceInfoMap() {
+		return availableDeviceInfoMap;
+	}
+	
+	public void setAvailableDeviceInfoMap(Map<String, Map<String, MdmBioDevice>> avlDeviceInfoMap) {
+		availableDeviceInfoMap = avlDeviceInfoMap;
+	}
 }

@@ -120,9 +120,11 @@ public class IdentityCaptureController {
 	@FXML
 	private Button btnCapture;
 	
+	@FXML
+	private Button btnDeviceRefresh;
+	
 	Stage dialog;
 	private AppContext appContext;
-	private Map<String, Map<String, MdmBioDevice>> availableDeviceInfoMap;
 	
     public void setContext(AppContext appContextInfo) {
     	this.appContext = appContextInfo;
@@ -133,7 +135,40 @@ public class IdentityCaptureController {
     	this.appContext.otpValueProperty().bind(otpValue.textProperty());
     	this.appContext.captureValueProperty().bind(capture);
     	this.appContext.isIdExistProperty().bind(Bindings.when(idValue.textProperty().isEmpty()).then(false).otherwise(true));
+		if (this.appContext.getAvailableDeviceInfoMap().size() == 0) {
+			loadAvailableDevices();
+		}    	
     }
+
+	@FXML
+	private void onDeviceRefresh() {
+		loadAvailableDevices();
+	}
+	
+	private void loadAvailableDevices() {
+		fpDevicesList.clear();
+		irisDevicesList.clear();
+		deviceBox.getItems().removeAll(deviceBox.getItems());
+		
+		Map<String, Map<String, MdmBioDevice>> availableDeviceInfoMap = deviceHelper.getDeviceList();
+		this.appContext.setAvailableDeviceInfoMap(availableDeviceInfoMap);
+		for (var entry : availableDeviceInfoMap.entrySet()) {
+			if (entry.getKey().equals("finger_single")) {
+				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
+				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
+					fpDevicesList.add(deviceEntry.getKey());
+				}
+			} else if (entry.getKey().equals("iris_single")) {
+				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
+				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
+					irisDevicesList.add(deviceEntry.getKey());
+				}				
+			}
+		}
+		rbFingerAuthType.setSelected(false);
+		rbIrisAuthType.setSelected(false);
+		rbOTPAuthType.setSelected(false);
+	}
     
 	public void initialize() {
 		responsetextField.setText(null);
@@ -155,23 +190,6 @@ public class IdentityCaptureController {
 		otpAnchorPane.disableProperty().bind(Bindings.when(canOTPPaneEnable()).then(false).otherwise(true));
 		fingerCount.disableProperty().bind(Bindings.when(isFPselected).then(false).otherwise(true));
 		irisType.disableProperty().bind(Bindings.when(isIrisSelected).then(false).otherwise(true));
-		
-		availableDeviceInfoMap = deviceHelper.getDeviceList();
-		fpDevicesList.clear();
-		irisDevicesList.clear();
-		for (var entry : availableDeviceInfoMap.entrySet()) {
-			if (entry.getKey().equals("finger_single")) {
-				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
-				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
-					fpDevicesList.add(deviceEntry.getKey());
-				}
-			} else if (entry.getKey().equals("iris_single")) {
-				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
-				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {
-					irisDevicesList.add(deviceEntry.getKey());
-				}				
-			}
-		}
 	}
 	
 	public void reset() {
@@ -180,11 +198,6 @@ public class IdentityCaptureController {
 		rbOTPAuthType.setSelected(false);
 		otpValue.setText("");
 		idValue.setText("");
-//		appContext.isBioAuthProperty().set(false);
-//		appContext.isOTPAuthProperty().set(false);
-//		appContext.individualIdProperty().set("");
-//		appContext.otpValueProperty().set("");
-//		appContext.captureValueProperty().set("");
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -263,7 +276,7 @@ public class IdentityCaptureController {
 		if (rbIrisAuthType.isSelected()) {
 			key = "iris_single";
 		}
-		for (var entry : availableDeviceInfoMap.entrySet()) {
+		for (var entry : appContext.getAvailableDeviceInfoMap().entrySet()) {
 			if (entry.getKey().equals(key)) {
 				Map<String, MdmBioDevice> fpMdmBioDeviceMap = entry.getValue();
 				for (var deviceEntry : fpMdmBioDeviceMap.entrySet()) {

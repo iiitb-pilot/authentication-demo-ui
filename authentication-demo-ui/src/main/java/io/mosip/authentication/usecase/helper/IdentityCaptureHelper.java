@@ -101,8 +101,8 @@ import io.mosip.authentication.demo.helper.CryptoUtility;
 import io.mosip.authentication.demo.service.util.KeyMgrUtil;
 import io.mosip.authentication.demo.service.util.SignatureUtil;
 import io.mosip.authentication.usecase.dto.AppContext;
-import io.mosip.authentication.usecase.dto.AuthRequest;
-import io.mosip.authentication.usecase.dto.AuthRequestBioInfo;
+import io.mosip.authentication.usecase.dto.CaptureRequestBioInfo;
+import io.mosip.authentication.usecase.dto.CaptureRequest;
 import io.mosip.authentication.usecase.dto.MdmBioDevice;
 import io.mosip.kernel.core.http.RequestWrapper;
 import io.mosip.kernel.core.util.CryptoUtil;
@@ -355,33 +355,33 @@ public class IdentityCaptureHelper {
 		return env.getProperty("isPreLTS", Boolean.class, false);
 	}
 	
-	public AuthRequest getAuthRequest(MdmBioDevice mdmBioDevice) throws Exception {
-		AuthRequest authRequest = new AuthRequest();
-		authRequest.setPurpose(mdmBioDevice.getPurpose());
-		authRequest.setSpecVersion(mdmBioDevice.getSpecVersion());
-		authRequest.setCaptureTime(getCaptureTime());
-		authRequest.setBio(new ArrayList<AuthRequestBioInfo>());
-		AuthRequestBioInfo bioInfo = new AuthRequestBioInfo();
+	public CaptureRequest getAuthRequest(MdmBioDevice mdmBioDevice) throws Exception {
+		CaptureRequest captureRequest = new CaptureRequest();
+		captureRequest.setPurpose(mdmBioDevice.getPurpose());
+		captureRequest.setSpecVersion(mdmBioDevice.getSpecVersion());
+		captureRequest.setCaptureTime(getCaptureTime());
+		captureRequest.setBio(new ArrayList<CaptureRequestBioInfo>());
+		CaptureRequestBioInfo bioInfo = new CaptureRequestBioInfo();
 		bioInfo.setType(mdmBioDevice.getDeviceType());
 		bioInfo.setDeviceId(mdmBioDevice.getDeviceId());
-		authRequest.getBio().add(bioInfo);
-		return authRequest;
+		captureRequest.getBio().add(bioInfo);
+		return captureRequest;
 	}
 	
 	public String captureFingerprint(int fingerCount, String prevHash, AppContext appContext, MdmBioDevice mdmBioDevice) throws Exception {
 		
-		AuthRequest authRequest = getAuthRequest(mdmBioDevice);
-		authRequest.setEnv(env.getProperty("ida.request.captureFinger.env"));
-		authRequest.setTimeout(env.getProperty("ida.request.captureFinger.timeout"));
-		authRequest.setDomainUri(env.getProperty("ida.request.captureFinger.domainUri"));
-		authRequest.setTransactionId(getTransactionID());
-		List<AuthRequestBioInfo> bioInfo = authRequest.getBio();
+		CaptureRequest captureRequest = getAuthRequest(mdmBioDevice);
+		captureRequest.setEnv(env.getProperty("ida.request.captureFinger.env"));
+		captureRequest.setTimeout(env.getProperty("ida.request.captureFinger.timeout"));
+		captureRequest.setDomainUri(env.getProperty("ida.request.captureFinger.domainUri"));
+		captureRequest.setTransactionId(getTransactionID());
+		List<CaptureRequestBioInfo> bioInfo = captureRequest.getBio();
 		bioInfo.get(0).setCount(String.valueOf(fingerCount));
 		bioInfo.get(0).setBioSubType(getBioSubTypeString(fingerCount, env.getProperty("ida.request.captureFinger.bioSubType")).split(","));
 		bioInfo.get(0).setDeviceSubId(getFingerDeviceSubId());
 		bioInfo.get(0).setPreviousHash(prevHash);
 		bioInfo.get(0).setRequestedScore(env.getProperty("ida.request.captureFinger.requestedScore"));
-		String requestBody = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(authRequest);
+		String requestBody = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(captureRequest);
 		return capturebiometrics(requestBody, prevHash, appContext, mdmBioDevice);
 	}
 	
@@ -389,18 +389,18 @@ public class IdentityCaptureHelper {
 		String irisSubtype = getIrisSubType(irisCount);
 		String bioSubType = getBioSubTypeString(irisCount, irisSubtype);
 
-		AuthRequest authRequest = getAuthRequest(mdmBioDevice);
-		authRequest.setEnv(env.getProperty("ida.request.captureIris.env"));
-		authRequest.setTimeout(env.getProperty("ida.request.captureIris.timeout"));
-		authRequest.setDomainUri(env.getProperty("ida.request.captureIris.domainUri"));
-		authRequest.setTransactionId(getTransactionID());
-		List<AuthRequestBioInfo> bioInfo = authRequest.getBio();
+		CaptureRequest captureRequest = getAuthRequest(mdmBioDevice);
+		captureRequest.setEnv(env.getProperty("ida.request.captureIris.env"));
+		captureRequest.setTimeout(env.getProperty("ida.request.captureIris.timeout"));
+		captureRequest.setDomainUri(env.getProperty("ida.request.captureIris.domainUri"));
+		captureRequest.setTransactionId(getTransactionID());
+		List<CaptureRequestBioInfo> bioInfo = captureRequest.getBio();
 		bioInfo.get(0).setCount(String.valueOf(irisCount));
 		bioInfo.get(0).setBioSubType(bioSubType.split(","));
 		bioInfo.get(0).setDeviceSubId(irisSubId);
 		bioInfo.get(0).setPreviousHash(prevHash);
 		bioInfo.get(0).setRequestedScore(env.getProperty("ida.request.captureIris.requestedScore"));
-		String requestBody = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(authRequest);
+		String requestBody = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(captureRequest);
 		return capturebiometrics(requestBody, prevHash, appContext, mdmBioDevice);
 	}
 	

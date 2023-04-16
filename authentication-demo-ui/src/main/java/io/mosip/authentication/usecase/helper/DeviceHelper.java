@@ -27,7 +27,6 @@ import io.mosip.authentication.usecase.config.AppConfig;
 import io.mosip.authentication.usecase.dto.MdmBioDevice;
 import io.mosip.authentication.usecase.provider.MosipDeviceSpecificationProvider;
 import io.mosip.kernel.core.logger.spi.Logger;
-import io.mosip.kernel.core.util.HMACUtils2;
 import io.mosip.kernel.core.util.StringUtils;
 
 @Service
@@ -69,6 +68,7 @@ public class DeviceHelper {
 	
 	
 	public Map<String, Map<String, MdmBioDevice>> getDeviceList() {
+		availableDeviceInfoMap = new LinkedHashMap<>();
 		int startPort = Integer.parseInt((String)mdmStartPort);
 		int endPort = Integer.parseInt((String)mdmEndPort);
 		if (startPort >= 4500 && endPort <= 4600) {
@@ -155,32 +155,4 @@ public class DeviceHelper {
 		return String.format("%s_%s", type.toLowerCase(), subType.toLowerCase());
 	}
 	
-	private static int getSubstrinInt(String idvid, int substrigLen, int radix) {
-		String hexSubstring = getSubstring(idvid, substrigLen);
-		return Integer.parseInt(hexSubstring, radix);
-	}
-
-	private static String getSubstring(String string, int substrigLen) {
-		int length = string.length();
-		return length > substrigLen ? string.substring(length - substrigLen) : string;
-	}
-	
-	public static void main(String[] args) {
-//		DeviceHelper helper = new DeviceHelper();
-//		helper.getDeviceInfo(4503);
-//		String uin = "758028348105";
-//		String salt = "N8N7WYQmVAcqUF4iawKHZw==";
-//		String uin = "2014369807593412";
-//		String salt = "FMo0NlN6kZbgM03WYrFSPw==";
-//		try {
-//			String idPlainHash = HMACUtils2.digestAsPlainText(uin.getBytes());
-//			int hexToDecimal = getSubstrinInt(idPlainHash, 3, 16);
-//			String decimalStr = String.valueOf(hexToDecimal);
-//			System.out.println(getSubstrinInt(decimalStr, 3, 10));
-//			System.out.println(HMACUtils2.digestAsPlainTextWithSalt(uin.getBytes(), salt.getBytes()));
-//		} catch (NoSuchAlgorithmException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	}
 }
